@@ -9,12 +9,20 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-i
 
 # Use DATABASE_URL from env (Render/Neon PostgreSQL), fallback to local SQLite
 _db_url = os.environ.get('DATABASE_URL', 'sqlite:///crm.db')
-# Normalize postgres:// -> postgresql+psycopg:// (psycopg3, Python 3.14 compatible)
+# Normalize to pg8000 driver (pure Python, works on any Python version)
 if _db_url.startswith('postgres://'):
-    _db_url = _db_url.replace('postgres://', 'postgresql+psycopg://', 1)
+    _db_url = _db_url.replace('postgres://', 'postgresql+pg8000://', 1)
 elif _db_url.startswith('postgresql://'):
-    _db_url = _db_url.replace('postgresql://', 'postgresql+psycopg://', 1)
+    _db_url = _db_url.replace('postgresql://', 'postgresql+pg8000://', 1)
+# pg8000 uses ssl_context instead of sslmode URL param
+if 'pg8000' in _db_url and 'sslmode' in _db_url:
+    import re as _re
+    _db_url = _re.sub(r'[?&]sslmode=[^&]*', '', _db_url)
 app.config['SQLALCHEMY_DATABASE_URI'] = _db_url
+if 'pg8000' in _db_url:
+    import ssl as _ssl
+    _ssl_ctx = _ssl.create_default_context()
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'connect_args': {'ssl_context': _ssl_ctx}}
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
