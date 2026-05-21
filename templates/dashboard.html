@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 class="fw-bold mb-0">Dashboard</h2>
+  <a href="{{ url_for('client_add') }}" class="btn btn-primary">
+    <i class="bi bi-plus-lg me-1"></i>Přidat klienta
+  </a>
+</div>
+
+<!-- Stat cards -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="card text-center shadow-sm h-100">
+      <div class="card-body">
+        <div class="fs-1 fw-bold text-dark">{{ total }}</div>
+        <div class="text-muted small">Celkem klientů</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <a href="{{ url_for('clients_list', status='new') }}" class="text-decoration-none">
+      <div class="card text-center shadow-sm h-100 card-hover">
+        <div class="card-body">
+          <div class="fs-1 fw-bold text-secondary">{{ new_count }}</div>
+          <div class="text-muted small">Neoslovení</div>
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-6 col-md-3">
+    <a href="{{ url_for('clients_list', status='contacted') }}" class="text-decoration-none">
+      <div class="card text-center shadow-sm h-100 card-hover">
+        <div class="card-body">
+          <div class="fs-1 fw-bold text-primary">{{ contacted }}</div>
+          <div class="text-muted small">Oslovení</div>
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-6 col-md-3">
+    <a href="{{ url_for('clients_list', status='responded') }}" class="text-decoration-none">
+      <div class="card text-center shadow-sm h-100 card-hover">
+        <div class="card-body">
+          <div class="fs-1 fw-bold text-success">{{ responded }}</div>
+          <div class="text-muted small">Odpověděli</div>
+        </div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<!-- Recent clients -->
+<div class="card shadow-sm">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span class="fw-semibold">Poslední přidané kontakty</span>
+    <a href="{{ url_for('clients_list') }}" class="btn btn-sm btn-outline-secondary">Všichni klienti</a>
+  </div>
+  {% if recent %}
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Jméno / Firma</th>
+          <th>Web</th>
+          <th>Status</th>
+          <th>Přidán</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in recent %}
+        <tr>
+          <td>
+            <div class="fw-semibold">{{ c.name }}</div>
+            {% if c.company %}<div class="text-muted small">{{ c.company }}</div>{% endif %}
+          </td>
+          <td>
+            {% if c.website_url %}
+              <a href="{{ c.website_url }}" target="_blank" class="text-truncate d-inline-block" style="max-width:200px">{{ c.website_url }}</a>
+            {% else %}–{% endif %}
+          </td>
+          <td><span class="badge bg-{{ c.status_color }}">{{ c.status_label }}</span></td>
+          <td class="text-muted small">{{ c.created_at.strftime('%d.%m.%Y') }}</td>
+          <td><a href="{{ url_for('client_detail', client_id=c.id) }}" class="btn btn-sm btn-outline-primary">Detail</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="card-body text-center text-muted py-5">
+    <i class="bi bi-people fs-1 d-block mb-2"></i>
+    Zatím žádní klienti. <a href="{{ url_for('client_add') }}">Přidejte prvního.</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

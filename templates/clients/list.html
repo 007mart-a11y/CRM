@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% block title %}Klienti{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 class="fw-bold mb-0">
+    {% if status_filter == 'new' %}Neoslovení
+    {% elif status_filter == 'contacted' %}Oslovení klienti
+    {% elif status_filter == 'responded' %}Odpověděli
+    {% elif status_filter == 'closed' %}Uzavření
+    {% else %}Všichni klienti{% endif %}
+    <span class="badge bg-secondary fs-6 ms-2">{{ clients|length }}</span>
+  </h2>
+  <a href="{{ url_for('client_add') }}" class="btn btn-primary">
+    <i class="bi bi-plus-lg me-1"></i>Přidat klienta
+  </a>
+</div>
+
+<!-- Search + filter -->
+<form method="GET" class="row g-2 mb-4">
+  <div class="col-md-6">
+    <div class="input-group">
+      <span class="input-group-text"><i class="bi bi-search"></i></span>
+      <input type="text" name="q" class="form-control" placeholder="Hledat dle jména, firmy, URL, e-mailu…" value="{{ q }}">
+      {% if status_filter %}<input type="hidden" name="status" value="{{ status_filter }}">{% endif %}
+    </div>
+  </div>
+  <div class="col-md-auto">
+    <button type="submit" class="btn btn-outline-primary">Hledat</button>
+    {% if q or status_filter %}
+      <a href="{{ url_for('clients_list') }}" class="btn btn-outline-secondary ms-1">Zrušit filtr</a>
+    {% endif %}
+  </div>
+</form>
+
+<!-- Status filter tabs -->
+<ul class="nav nav-pills mb-3">
+  <li class="nav-item">
+    <a class="nav-link {% if not status_filter %}active{% endif %}" href="{{ url_for('clients_list', q=q) }}">Všichni</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link {% if status_filter == 'new' %}active{% endif %}" href="{{ url_for('clients_list', status='new', q=q) }}">
+      <span class="badge bg-secondary me-1">●</span>Neoslovení
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link {% if status_filter == 'contacted' %}active{% endif %}" href="{{ url_for('clients_list', status='contacted', q=q) }}">
+      <span class="badge bg-primary me-1">●</span>Oslovení
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link {% if status_filter == 'responded' %}active{% endif %}" href="{{ url_for('clients_list', status='responded', q=q) }}">
+      <span class="badge bg-success me-1">●</span>Odpověděli
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link {% if status_filter == 'closed' %}active{% endif %}" href="{{ url_for('clients_list', status='closed', q=q) }}">
+      <span class="badge bg-dark me-1">●</span>Uzavření
+    </a>
+  </li>
+</ul>
+
+<!-- Table -->
+{% if clients %}
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0 align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>Jméno / Firma</th>
+          <th>Web</th>
+          <th>E-mail / Telefon</th>
+          <th>Status</th>
+          <th>Přidán</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in clients %}
+        <tr>
+          <td>
+            <div class="fw-semibold">{{ c.name }}</div>
+            {% if c.company %}<div class="text-muted small">{{ c.company }}</div>{% endif %}
+          </td>
+          <td>
+            {% if c.website_url %}
+              <a href="{{ c.website_url }}" target="_blank" class="text-truncate d-inline-block" style="max-width:180px" title="{{ c.website_url }}">
+                {{ c.website_url }}
+              </a>
+            {% else %}<span class="text-muted">–</span>{% endif %}
+          </td>
+          <td>
+            {% if c.email %}<div class="small">{{ c.email }}</div>{% endif %}
+            {% if c.phone %}<div class="small text-muted">{{ c.phone }}</div>{% endif %}
+            {% if not c.email and not c.phone %}<span class="text-muted">–</span>{% endif %}
+          </td>
+          <td>
+            <form method="POST" action="{{ url_for('client_status', client_id=c.id) }}" class="d-inline">
+              <select name="status" class="form-select form-select-sm status-select border-0 bg-transparent fw-semibold text-{{ c.status_color }}" onchange="this.form.submit()" style="width:auto">
+                <option value="new" {% if c.status == 'new' %}selected{% endif %}>Nový</option>
+                <option value="contacted" {% if c.status == 'contacted' %}selected{% endif %}>Osloven</option>
+                <option value="responded" {% if c.status == 'responded' %}selected{% endif %}>Odpověděl</option>
+                <option value="closed" {% if c.status == 'closed' %}selected{% endif %}>Uzavřen</option>
+              </select>
+            </form>
+          </td>
+          <td class="text-muted small">{{ c.created_at.strftime('%d.%m.%Y') }}</td>
+          <td>
+            <a href="{{ url_for('client_detail', client_id=c.id) }}" class="btn btn-sm btn-outline-primary">
+              <i class="bi bi-eye"></i>
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="text-center text-muted py-5">
+  <i class="bi bi-search fs-1 d-block mb-2"></i>
+  {% if q %}Žádný klient neodpovídá hledání „{{ q }}".
+  {% else %}Žádní klienti v této kategorii.{% endif %}
+  <div class="mt-2"><a href="{{ url_for('client_add') }}">Přidat klienta</a></div>
+</div>
+{% endif %}
+{% endblock %}

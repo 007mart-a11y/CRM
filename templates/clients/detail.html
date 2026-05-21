@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% block title %}{{ client.name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-1">
+        <li class="breadcrumb-item"><a href="{{ url_for('clients_list') }}">Klienti</a></li>
+        <li class="breadcrumb-item active">{{ client.name }}</li>
+      </ol>
+    </nav>
+    <h2 class="fw-bold mb-0">{{ client.name }}</h2>
+    {% if client.company %}<div class="text-muted">{{ client.company }}</div>{% endif %}
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('client_edit', client_id=client.id) }}" class="btn btn-outline-secondary">
+      <i class="bi bi-pencil me-1"></i>Upravit
+    </a>
+    <form method="POST" action="{{ url_for('client_delete', client_id=client.id) }}"
+          onsubmit="return confirm('Opravdu smazat tohoto klienta?')">
+      <button type="submit" class="btn btn-outline-danger">
+        <i class="bi bi-trash me-1"></i>Smazat
+      </button>
+    </form>
+  </div>
+</div>
+
+<div class="row g-4">
+
+  <!-- Info + status -->
+  <div class="col-md-4">
+    <div class="card shadow-sm mb-3">
+      <div class="card-header fw-semibold">Informace</div>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+          <div class="text-muted small">Status</div>
+          <span class="badge bg-{{ client.status_color }} fs-6">{{ client.status_label }}</span>
+        </li>
+        {% if client.website_url %}
+        <li class="list-group-item">
+          <div class="text-muted small">Web</div>
+          <a href="{{ client.website_url }}" target="_blank" class="text-break">{{ client.website_url }}</a>
+        </li>
+        {% endif %}
+        {% if client.email %}
+        <li class="list-group-item">
+          <div class="text-muted small">E-mail</div>
+          <a href="mailto:{{ client.email }}">{{ client.email }}</a>
+        </li>
+        {% endif %}
+        {% if client.phone %}
+        <li class="list-group-item">
+          <div class="text-muted small">Telefon</div>
+          {{ client.phone }}
+        </li>
+        {% endif %}
+        <li class="list-group-item">
+          <div class="text-muted small">Přidán</div>
+          {{ client.created_at.strftime('%d.%m.%Y %H:%M') }}
+        </li>
+        {% if client.updated_at != client.created_at %}
+        <li class="list-group-item">
+          <div class="text-muted small">Upraven</div>
+          {{ client.updated_at.strftime('%d.%m.%Y %H:%M') }}
+        </li>
+        {% endif %}
+      </ul>
+    </div>
+
+    <!-- Quick status change -->
+    <div class="card shadow-sm">
+      <div class="card-header fw-semibold">Změnit status</div>
+      <div class="card-body">
+        <form method="POST" action="{{ url_for('client_status', client_id=client.id) }}" class="d-flex flex-column gap-2">
+          {% for val, label, color in [('new','Nový','secondary'),('contacted','Osloven','primary'),('responded','Odpověděl','success'),('closed','Uzavřen','dark')] %}
+          <button type="submit" name="status" value="{{ val }}"
+            class="btn btn-sm btn-{% if client.status == val %}{{ color }}{% else %}outline-{{ color }}{% endif %}">
+            {{ label }}
+          </button>
+          {% endfor %}
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notes -->
+  <div class="col-md-8">
+    <div class="card shadow-sm">
+      <div class="card-header fw-semibold">Poznámky</div>
+      <div class="card-body">
+        <form method="POST" action="{{ url_for('note_add', client_id=client.id) }}" class="mb-4">
+          <div class="mb-2">
+            <textarea name="content" class="form-control" rows="3" placeholder="Napište poznámku…" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-sm">
+            <i class="bi bi-plus-lg me-1"></i>Přidat poznámku
+          </button>
+        </form>
+
+        {% if client.notes %}
+          <div class="notes-timeline">
+            {% for note in client.notes %}
+            <div class="note-item mb-3 p-3 bg-light rounded">
+              <div class="text-muted small mb-1">
+                <i class="bi bi-clock me-1"></i>{{ note.created_at.strftime('%d.%m.%Y %H:%M') }}
+              </div>
+              <div class="note-content">{{ note.content | replace('\n', '<br>') | safe }}</div>
+            </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-muted text-center py-3">Zatím žádné poznámky.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
