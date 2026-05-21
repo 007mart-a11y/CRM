@@ -9,7 +9,6 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-i
 
 # Use DATABASE_URL from env (Render/Neon PostgreSQL), fallback to local SQLite
 _db_url = os.environ.get('DATABASE_URL', 'sqlite:///crm.db')
-# Render gives "postgres://" but SQLAlchemy needs "postgresql://"
 if _db_url.startswith('postgres://'):
     _db_url = _db_url.replace('postgres://', 'postgresql://', 1)
 app.config['SQLALCHEMY_DATABASE_URI'] = _db_url
