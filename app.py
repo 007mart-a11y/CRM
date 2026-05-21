@@ -219,5 +219,13 @@ def client_status(client_id):
     return redirect(request.referrer or url_for('client_detail', client_id=client.id))
 
 
+@app.route('/health')
+def health():
+    import os
+    db_url = app.config['SQLALCHEMY_DATABASE_URI']
+    db_type = 'postgresql' if 'postgresql' in db_url else 'sqlite'
+    return {'db': db_type, 'url_prefix': db_url[:30]}
+
+
 if __name__ == '__main__':
     app.run(debug=True)
