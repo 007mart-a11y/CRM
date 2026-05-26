@@ -1,60 +1,121 @@
+:root {
+  --accent: #ff5c35;
+  --accent-dark: #e04520;
+  --sidebar-from: #12002e;
+  --sidebar-to: #2a0a4e;
+  --sidebar-active: rgba(255, 92, 53, 0.25);
+  --sidebar-hover: rgba(255,255,255,0.08);
+}
+
 body {
-  background-color: #f8f9fa;
+  background-color: #f0f2f7;
+  font-family: 'Segoe UI', system-ui, sans-serif;
 }
 
 #wrapper {
   min-height: 100vh;
 }
 
+/* ── Sidebar ──────────────────────────────────────────────── */
 #sidebar {
-  width: 260px;
+  width: 265px;
   min-height: 100vh;
-  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+  background: linear-gradient(160deg, var(--sidebar-from) 0%, var(--sidebar-to) 100%);
   position: sticky;
   top: 0;
   height: 100vh;
   overflow-y: auto;
+  border-right: 1px solid rgba(255,92,53,0.15);
+}
+
+.accent-icon {
+  color: var(--accent);
+  filter: drop-shadow(0 0 6px rgba(255,92,53,0.6));
+}
+
+.sidebar-tagline {
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.45);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+#sidebar hr {
+  border-color: rgba(255,255,255,0.12);
 }
 
 #sidebar .nav-link {
   border-radius: 8px;
   padding: 8px 12px;
-  transition: background 0.15s;
+  transition: background 0.15s, color 0.15s;
+  font-size: 0.92rem;
 }
 
 #sidebar .nav-link:hover {
-  background: rgba(255,255,255,0.1);
+  background: var(--sidebar-hover);
 }
 
 #sidebar .nav-link.active {
-  background: rgba(255,255,255,0.2);
+  background: var(--sidebar-active);
+  color: #fff !important;
+  border-left: 3px solid var(--accent);
+  padding-left: 9px;
+  font-weight: 600;
 }
 
+/* ── Page content ─────────────────────────────────────────── */
 #page-content {
   min-height: 100vh;
-  background: #f8f9fa;
+  background: #f0f2f7;
 }
 
+/* ── Cards ────────────────────────────────────────────────── */
 .card {
   border: none;
-  border-radius: 12px;
+  border-radius: 14px;
+  background: #fff;
 }
 
 .card-hover:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1) !important;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(42, 10, 78, 0.12) !important;
   transition: all 0.2s;
 }
 
-.table th {
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #6c757d;
+/* stat cards on dashboard */
+.stat-card {
+  border-radius: 14px;
+  color: #fff;
+}
+.stat-card.c-total   { background: linear-gradient(135deg, #2a0a4e, #5a1e9e); }
+.stat-card.c-new     { background: linear-gradient(135deg, #0f4c75, #1b6ca8); }
+.stat-card.c-contact { background: linear-gradient(135deg, #b5451b, var(--accent)); }
+.stat-card.c-resp    { background: linear-gradient(135deg, #1a6b3c, #2ecc71); }
+.stat-card.c-closed  { background: linear-gradient(135deg, #2d2d2d, #555); }
+
+/* ── Buttons ──────────────────────────────────────────────── */
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.btn-primary:hover, .btn-primary:focus {
+  background: var(--accent-dark);
+  border-color: var(--accent-dark);
 }
 
+/* ── Table ────────────────────────────────────────────────── */
+.table th {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #8b8fa8;
+}
+
+/* ── Notes ────────────────────────────────────────────────── */
 .note-item {
-  border-left: 3px solid #0d6efd;
+  border-left: 3px solid var(--accent);
+  background: #fdf5f2;
+  border-radius: 0 8px 8px 0;
 }
 
 .note-content {
@@ -62,6 +123,10 @@ body {
   font-size: 0.95rem;
 }
 
+/* ── Status badges ────────────────────────────────────────── */
+.badge.bg-secondary { background-color: #8b8fa8 !important; }
+
+/* ── Misc ─────────────────────────────────────────────────── */
 .status-select {
   cursor: pointer;
   font-size: 0.875rem;
@@ -71,6 +136,7 @@ body {
   font-size: 0.875rem;
 }
 
+/* ── Responsive ───────────────────────────────────────────── */
 @media (max-width: 768px) {
   #sidebar {
     width: 100%;
