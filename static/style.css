@@ -95,12 +95,12 @@ body {
 
 /* ── Buttons ──────────────────────────────────────────────── */
 .btn-primary {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: #ff5c35 !important;
+  border-color: #ff5c35 !important;
 }
 .btn-primary:hover, .btn-primary:focus {
-  background: var(--accent-dark);
-  border-color: var(--accent-dark);
+  background: #e04520 !important;
+  border-color: #e04520 !important;
 }
 
 /* ── Table ────────────────────────────────────────────────── */
